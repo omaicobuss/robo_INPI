@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robo INPI - Interface de Controle</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-robot text-primary fa-3x"></i>
+                        <h4 class="text-white mt-2">Robo INPI</h4>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link text-white active" href="#dashboard">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#verificar">
+                                <i class="fas fa-search"></i> Verificar ZIP
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#download">
+                                <i class="fas fa-download"></i> Download
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="#logs">
+                                <i class="fas fa-list"></i> Logs
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Dashboard - Robo INPI</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+                                <i class="fas fa-sync-alt"></i> Atualizar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Cards -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Status do Sistema
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="systemStatus">
+                                            <i class="fas fa-circle text-success"></i> Online
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-server fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Último Arquivo
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="lastFile">
+                                            Não verificado
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-file-archive fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Downloads
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="downloadCount">0</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-download fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Última Execução
+                                        </div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="lastExecution">
+                                            Nunca
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Panel -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-cogs"></i> Painel de Controle
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <button class="btn btn-primary btn-lg w-100" id="verificarBtn">
+                                            <i class="fas fa-search"></i> Verificar Maior ZIP
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <button class="btn btn-success btn-lg w-100" id="baixarBtn" disabled>
+                                            <i class="fas fa-download"></i> Baixar Arquivo
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <button class="btn btn-info btn-lg w-100" id="lerBtn" disabled>
+                                            <i class="fas fa-file-alt"></i> Ler Conteúdo
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <button class="btn btn-warning btn-lg w-100" id="limparBtn">
+                                            <i class="fas fa-trash"></i> Limpar Logs
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- URL Input -->
+                                <div class="mt-4">
+                                    <label for="urlInput" class="form-label">URL Personalizada (opcional):</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="urlInput" 
+                                               placeholder="https://revistas.inpi.gov.br/rpi/" 
+                                               value="https://revistas.inpi.gov.br/rpi/">
+                                        <button class="btn btn-outline-secondary" type="button" id="resetUrlBtn">
+                                            <i class="fas fa-undo"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Panel -->
+                    <div class="col-lg-4">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-tasks"></i> Progresso
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="progress mb-3">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%" 
+                                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="progressBar">
+                                        0%
+                                    </div>
+                                </div>
+                                <div id="currentTask" class="text-muted">
+                                    <i class="fas fa-clock"></i> Aguardando comando...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs Panel -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-terminal"></i> Painel de Logs
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="logPanel" class="log-panel">
+                                    <div class="log-entry">
+                                        <span class="timestamp" id="initialTimestamp"></span>
+                                        <span class="log-info">Sistema iniciado - Aguardando comandos...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
