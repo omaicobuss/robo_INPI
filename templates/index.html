@@ -30,8 +30,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="#download">
-                                <i class="fas fa-download"></i> Download
+                            <a class="nav-link text-white" href="#processar">
+                                <i class="fas fa-cogs"></i> Processar Completo
                             </a>
                         </li>
                         <li class="nav-item">
@@ -104,12 +104,12 @@
                                 <div class="row no-gutters align-items-center">
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
-                                            Downloads
+                                            Ocorrências Encontradas
                                         </div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="downloadCount">0</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="occurrenceCount">0</div>
                                     </div>
                                     <div class="col-auto">
-                                        <i class="fas fa-download fa-2x text-gray-300"></i>
+                                        <i class="fas fa-search fa-2x text-gray-300"></i>
                                     </div>
                                 </div>
                             </div>
@@ -147,6 +147,39 @@
                                 </h6>
                             </div>
                             <div class="card-body">
+                                <!-- Configurações -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <label for="urlInput" class="form-label">URL do INPI:</label>
+                                        <div class="input-group mb-3">
+                                            <input type="text" class="form-control" id="urlInput" 
+                                                   placeholder="https://revistas.inpi.gov.br/rpi/" 
+                                                   value="https://revistas.inpi.gov.br/rpi/">
+                                            <button class="btn btn-outline-secondary" type="button" id="resetUrlBtn">
+                                                <i class="fas fa-undo"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- String de Busca -->
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <label for="searchStringInput" class="form-label">String para Buscar:</label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchStringInput" 
+                                                   placeholder="Digite a string que deseja buscar nos arquivos .txt">
+                                            <button class="btn btn-outline-info" type="button" id="clearSearchBtn">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                        <small class="form-text text-muted">
+                                            Esta string será buscada em todos os arquivos .txt extraídos do ZIP
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- Botões de Ação -->
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <button class="btn btn-primary btn-lg w-100" id="verificarBtn">
@@ -154,31 +187,18 @@
                                         </button>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <button class="btn btn-success btn-lg w-100" id="baixarBtn" disabled>
-                                            <i class="fas fa-download"></i> Baixar Arquivo
+                                        <button class="btn btn-success btn-lg w-100" id="processarCompletoBtn">
+                                            <i class="fas fa-cogs"></i> Processar Completo
                                         </button>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <button class="btn btn-info btn-lg w-100" id="lerBtn" disabled>
-                                            <i class="fas fa-file-alt"></i> Ler Conteúdo
+                                        <button class="btn btn-info btn-lg w-100" id="baixarBtn" disabled>
+                                            <i class="fas fa-download"></i> Baixar Arquivo
                                         </button>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <button class="btn btn-warning btn-lg w-100" id="limparBtn">
                                             <i class="fas fa-trash"></i> Limpar Logs
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- URL Input -->
-                                <div class="mt-4">
-                                    <label for="urlInput" class="form-label">URL Personalizada (opcional):</label>
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="urlInput" 
-                                               placeholder="https://revistas.inpi.gov.br/rpi/" 
-                                               value="https://revistas.inpi.gov.br/rpi/">
-                                        <button class="btn btn-outline-secondary" type="button" id="resetUrlBtn">
-                                            <i class="fas fa-undo"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -206,6 +226,28 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Status Panel -->
+                        <div class="card shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-info">
+                                    <i class="fas fa-info-circle"></i> Status Atual
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="statusInfo" class="small">
+                                    <div class="mb-2">
+                                        <strong>Etapa:</strong> <span id="currentStep">Aguardando</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>Arquivo:</strong> <span id="currentFile">Nenhum</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <strong>String:</strong> <span id="currentSearch">Não definida</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -213,10 +255,18 @@
                 <div class="row">
                     <div class="col-12">
                         <div class="card shadow mb-4">
-                            <div class="card-header py-3">
+                            <div class="card-header py-3 d-flex justify-content-between align-items-center">
                                 <h6 class="m-0 font-weight-bold text-primary">
                                     <i class="fas fa-terminal"></i> Painel de Logs
                                 </h6>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-secondary" id="pauseLogsBtn">
+                                        <i class="fas fa-pause"></i> Pausar
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" id="exportLogsBtn">
+                                        <i class="fas fa-download"></i> Exportar
+                                    </button>
+                                </div>
                             </div>
                             <div class="card-body">
                                 <div id="logPanel" class="log-panel">
